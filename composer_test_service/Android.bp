@@ -1,0 +1,62 @@
+cc_binary {
+    name: "libcomposertestservice",
+    defaults: ["qtidisplay_defaults"],
+    sanitize: {
+        integer_overflow: true,
+    },
+    vendor: true,
+    relative_install_path: "hw",
+    header_libs: [
+        "display_headers",
+        "qti_kernel_headers",
+        "qti_display_kernel_headers",
+        "device_kernel_headers",
+        "common_interface_headers",
+        "libimapper_stablec",
+        "libimapper_providerutils",
+    ],
+    cflags: [
+        "-Wno-missing-field-initializers",
+        "-Wno-unused-parameter",
+        "-DLOG_TAG=\"SDM_TEST_COMPOSER\"",
+    ],
+
+    shared_libs: [
+        "libbinder",
+        "libhardware",
+        "libutils",
+        "libcutils",
+        "libsync",
+        "libc++",
+        "liblog",
+        "libhidlbase",
+        "libhardware_legacy",
+        "libsdmcore",
+        "libqdutils",
+        "libqdMetaData",
+        "libdisplaydebug",
+        "libsdmutils",
+        "libgrallocutils",
+        "android.hardware.graphics.allocator-V2-ndk",
+        "libgralloc.qti",
+        "libgralloctypes",
+        "libdrm",
+        "libc",
+        "libbinder_ndk",
+        "libvndksupport",
+        "vendor.qti.hardware.display.config-V12-ndk",
+        "libmapperutils"
+    ],
+
+    static_libs: [
+        "libaidlcommonsupport",
+    ],
+    srcs: [
+        "sdm_comp_buffer_allocator.cpp",
+        "sdm_comp_debugger.cpp",
+        "composer_test_service.cpp",
+        "ICompTestBndService.cpp",
+        "comp_test_bnd_service.cpp"
+    ],
+    init_rc: ["libcomposertestservice.rc"],
+}
