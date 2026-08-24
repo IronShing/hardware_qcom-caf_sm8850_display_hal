@@ -371,7 +371,10 @@ ScopedAStatus AidlComposerClient::getDisplayAttribute(int64_t in_display, int32_
 
   switch (in_attribute) {
     case DisplayAttribute::VSYNC_PERIOD:
-      *aidl_return = INT32(attributes.vsync_period_ns);
+      // NX809J: ZTE libsdmextension reports vsync_period_ns=0 with the real
+      // period (ns) in the fps field; fall back so SF gets a valid period.
+      *aidl_return = INT32(attributes.vsync_period_ns ? attributes.vsync_period_ns
+                                                      : attributes.fps);
       break;
     case DisplayAttribute::WIDTH:
       *aidl_return = INT32(attributes.x_pixels);
@@ -431,7 +434,13 @@ ScopedAStatus AidlComposerClient::getDisplayConfigurations(
     display_configuration.height = variable_config.y_pixels;
     display_configuration.dpi = {static_cast<float>(variable_config.x_dpi),
                                  static_cast<float>(variable_config.y_dpi)};
-    display_configuration.vsyncPeriod = variable_config.vsync_period_ns;
+    // NX809J: the ZTE libsdmextension reports vsync_period_ns=0 and puts the
+    // actual vsync period (in ns) in the fps field. A 0 vsyncPeriod makes SF's
+    // RefreshRateSelector build an infinite FpsRange and abort with
+    // "No matching frame rate modes". Fall back to the fps field (period-ns).
+    display_configuration.vsyncPeriod = variable_config.vsync_period_ns
+                                            ? variable_config.vsync_period_ns
+                                            : variable_config.fps;
     display_configuration.configGroup =
         settings_->GetDisplayConfigGroup(in_display, variable_config);
 
